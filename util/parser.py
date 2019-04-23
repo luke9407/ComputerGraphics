@@ -1,3 +1,3 @@
 class Parser:
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, f):
+        self.file = f

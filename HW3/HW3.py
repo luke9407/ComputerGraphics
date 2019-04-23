@@ -95,7 +95,7 @@ def main():
     if len(args) != 2:
         sys.exit('No data file or too many arguments!')
 
-    file = args.pop()
+    f = args.pop()
 
     glutInit(args)
 
