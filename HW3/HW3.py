@@ -2,6 +2,9 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+from util.quaternion import *
+from util.vector import *
+
 
 class SweptSurface:
 
@@ -12,6 +15,9 @@ class SweptSurface:
         self.camera = [0.0, -10.0, 0.0]
         self.center = [0.0, 0.0, 0.0]
         self.up = [0.0, 0.0, 1.0]
+
+        self.action = 0
+        self.last_mouse_window = None
 
     def init(self):
         glClearColor(0.74902, 0.847059, 0.847059, 1.0)
@@ -75,19 +81,55 @@ class SweptSurface:
 
         glMatrixMode(GL_MODELVIEW)
 
-    # def mouseToWorldVector(self, winX, winY):
-    #     vCamera = Vector.fromList(self.camera)
-    #     vCenter = Vector.fromList(self.center)
-    #
-    #     vView = vCamera - vCenter
-    #
-    #     vZ = vView.normalize()
-    #     vX = Vector.fromList(self.up).outer(vZ).normalize()
-    #     vY = vX.outer(vZ).normalize()
-    #
-    #     v = vX.scale(winX) + vY.scale(winY)
-    #
-    #     return v
+    def mouse(self, button, state, x, y):
+        if state == GLUT_DOWN:
+            self.action = 1
+            self.last_mouse_window = [x, y]
+        else:
+            self.action = 0
+
+        glutPostRedisplay()
+
+    def motion(self, x, y):
+        win_x = x - self.last_mouse_window[0]
+        win_y = y - self.last_mouse_window[1]
+
+        if win_x != 0.0 or win_y != 0.0:
+            v_view = Vector.fromList(self.camera) - Vector.fromList(self.center)
+            v = self.mouse_to_world_vector(win_x, win_y).scale(0.3)
+
+            v_camera_new = v_view + v
+
+            axis = v_view.outer(v_camera_new).normalize()
+            angle = v_view.angle(v_camera_new)
+
+            p1 = Quaternion.imaginary(v_view.toList())
+            p2 = Quaternion.imaginary(self.up)
+            v = Quaternion.imaginary(axis.toList())
+            q = Quaternion.q(v, -angle)
+
+            q_camera_new = q * p1 * -q
+            q_up_new = q * p2 * -q
+
+            self.camera = (Quaternion.imaginary(self.center) + q_camera_new).toList()
+            self.up = q_up_new.toList()
+
+        self.last_mouse_window = [x, y]
+        glutPostRedisplay()
+
+    def mouse_to_world_vector(self, win_x, win_y):
+        v_camera = Vector.fromList(self.camera)
+        v_center = Vector.fromList(self.center)
+
+        v_view = v_camera - v_center
+
+        v_z = v_view.normalize()
+        v_x = Vector.fromList(self.up).outer(v_z).normalize()
+        v_y = v_x.outer(v_z).normalize()
+
+        v = v_x.scale(win_x) + v_y.scale(win_y)
+
+        return v
 
 
 def main():
@@ -112,6 +154,10 @@ def main():
     glutDisplayFunc(swept_surface.display)
 
     glutReshapeFunc(swept_surface.reshape)
+
+    glutMouseFunc(swept_surface.mouse)
+
+    glutMotionFunc(swept_surface.motion)
 
     glutMainLoop()
 
