@@ -89,27 +89,6 @@ class SweptSurface:
                 cross_point_spline.append(translated)
             self.cross_point_splines.append(cross_point_spline)
 
-    def draw_axis(self):
-        glColor3f(1.0, 1.0, 1.0)
-
-        glBegin(GL_LINE_LOOP)
-        glColor3f(1.0, 0.0, 0.0)
-        glVertex3f(0.0, 0.0, 0.0)
-        glVertex3f(30.0, 0.0, 0.0)
-        glEnd()
-
-        glBegin(GL_LINE_LOOP)
-        glColor3f(0.0, 1.0, 0.0)
-        glVertex3f(0.0, 0.0, 0.0)
-        glVertex3f(0.0, 30.0, 0.0)
-        glEnd()
-
-        glBegin(GL_LINE_LOOP)
-        glColor3f(0.0, 0.0, 1.0)
-        glVertex3f(0.0, 0.0, 0.0)
-        glVertex3f(0.0, 0.0, 30.0)
-        glEnd()
-
     def display(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
