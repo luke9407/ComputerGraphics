@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -432,9 +435,10 @@ class Car:
                 p2 = Quaternion.imaginary(self.up)
                 v = Quaternion.imaginary(axis.toList())
                 q = Quaternion.q(v, -angle)
+                q_inv = q.inverse()
 
-                qCameraNew = q * p1 * -q
-                qUpNew = q * p2 * -q
+                qCameraNew = q * p1 * q_inv
+                qUpNew = q * p2 * q_inv
 
                 self.camera = (Quaternion.imaginary(self.center) + qCameraNew).toList()
                 self.up = qUpNew.toList()
