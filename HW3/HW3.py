@@ -1,5 +1,6 @@
 import sys
-sys.path.append('../')
+import os
+sys.path.append(os.path.join(sys.path[0], '..'))
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -253,7 +254,8 @@ class SweptSurface:
 def main():
     args = sys.argv
 
-    f = args.pop() if len(args) == 2 else 'sample/my.txt'
+    script_dir = os.path.dirname(__file__)
+    f = args.pop() if len(args) == 2 else os.path.join(script_dir, 'sample/my.txt')
     parser = Parser(f)
 
     glutInit(args)
