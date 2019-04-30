@@ -127,10 +127,18 @@ class SweptSurface:
                 glColor3f(
                     float(i) / float(spline_cnt),
                     float(j) / float(point_cnt),
-                    float(i + j) / float(spline_cnt + point_cnt)
+                    0.5
                 )
 
                 glBegin(GL_QUADS)
+                glVertex3f(s1[j][0], s1[j][1], s1[j][2])
+                glVertex3f(s1[j + 1][0], s1[j + 1][1], s1[j + 1][2])
+                glVertex3f(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2])
+                glVertex3f(s2[j][0], s2[j][1], s2[j][2])
+                glEnd()
+
+                glColor3f(0.0, 0.0, 0.0)
+                glBegin(GL_LINE_LOOP)
                 glVertex3f(s1[j][0], s1[j][1], s1[j][2])
                 glVertex3f(s1[j + 1][0], s1[j + 1][1], s1[j + 1][2])
                 glVertex3f(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2])
