@@ -252,10 +252,8 @@ class SweptSurface:
 
 def main():
     args = sys.argv
-    if len(args) != 2:
-        sys.exit('No data file or too many arguments!')
 
-    f = args.pop()
+    f = args.pop() if len(args) == 2 else 'sample/my.txt'
     parser = Parser(f)
 
     glutInit(args)
