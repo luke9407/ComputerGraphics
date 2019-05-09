@@ -6,13 +6,13 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-from parser import *
+from util.parser import *
 
 from util.quaternion import *
 from util.vector import *
 
-from spline.bspline import *
-from spline.catmullrom import *
+from util.spline.bspline import *
+from util.spline.catmullrom import *
 
 class SweptSurface:
 
@@ -255,7 +255,7 @@ def main():
     args = sys.argv
 
     script_dir = os.path.dirname(__file__)
-    f = args.pop() if len(args) == 2 else os.path.join(script_dir, 'sample/my.txt')
+    f = args.pop() if len(args) == 2 else os.path.join(script_dir, '../sample/my.txt')
     parser = Parser(f)
 
     glutInit(args)

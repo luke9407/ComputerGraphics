@@ -60,3 +60,17 @@ class Vector:
         y = (other - self).size()
         x = self.size()
         return atan2(y, x)
+
+    def calculate_normal(self, p0, p1, p2):
+        v_p0 = Vector.fromList(p0)
+        v_p1 = Vector.fromList(p1)
+        v_p2 = Vector.fromList(p2)
+
+        v1 = v_p1 - v_p0
+        v2 = v_p2 - v_p0
+
+        normal = v1.outer(v2)
+        if normal.inner(v_p0 - self) > 0:
+            normal = -normal
+
+        return normal.toList()
