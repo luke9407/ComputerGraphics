@@ -207,53 +207,41 @@ class Shading:
 
     def draw_box(self, length, mat=''):
         cube = [
-            [[0.0, 0.0, 0.0], [length, 0.0, 0.0], [length, length, 0.0]],
-            [[length, length, 0.0], [0.0, length, 0.0], [0.0, 0.0, 0.0]],
-            [[0.0, 0.0, 0.0], [0.0, length, 0.0], [0.0, length, length]],
-            [[0.0, length, length], [0.0, 0.0, length], [0.0, 0.0, 0.0]],
-            [[0.0, 0.0, 0.0], [length, 0.0, 0.0], [length, 0.0, length]],
-            [[length, 0.0, length], [0.0, 0.0, length], [0.0, 0.0, 0.0]],
-            [[0.0, length, 0.0], [length, length, 0.0], [length, length, length]],
-            [[length, length, length], [0.0, length, length], [0.0, length, 0.0]],
-            [[length, 0.0, 0.0], [length, length, 0.0], [length, length, length]],
-            [[length, length, length], [length, 0.0, length], [length, 0.0, 0.0]],
-            [[0.0, 0.0, length], [length, 0.0, length], [length, length, length]],
-            [[length, length, length], [0.0, length, length], [0.0, 0.0, length]]
-        ]
-        normals = [
-            [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [0.0, -1.0, 0.0], [0.0, -1.0, 0.0],
-            [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0]
+            {'points': [[0.0, 0.0, 0.0], [length, 0.0, 0.0], [length, length, 0.0], [0.0, length, 0.0]], 'normal': [0.0, 0.0, -1.0], 'color': [1.0, 0.0, 0.0]},
+            {'points': [[0.0, 0.0, 0.0], [0.0, length, 0.0], [0.0, length, length], [0.0, 0.0, length]], 'normal': [-1.0, 0.0, 0.0], 'color': [0.0, 1.0, 0.0]},
+            {'points': [[0.0, 0.0, 0.0], [length, 0.0, 0.0], [length, 0.0, length], [0.0, 0.0, length]], 'normal': [0.0, -1.0, 0.0], 'color': [0.0, 0.0, 1.0]},
+            {'points': [[0.0, length, 0.0], [length, length, 0.0], [length, length, length], [0.0, length, length]], 'normal': [0.0, 1.0, 0.0], 'color': [1.0, 1.0, 0.0]},
+            {'points': [[length, 0.0, 0.0], [length, length, 0.0], [length, length, length], [length, 0.0, length]], 'normal': [1.0, 0.0, 0.0], 'color': [1.0, 0.0, 1.0]},
+            {'points': [[0.0, 0.0, length], [length, 0.0, length], [length, length, length], [0.0, length, length]], 'normal': [0.0, 0.0, 1.0], 'color': [0.0, 1.0, 1.0]},
         ]
 
         if mat is not '':
             self.set_material(mat)
 
         v_camera = Vector.fromList(self.camera) - Vector.fromList(self.center)
-        order = {'back': {}, 'front': {}}
+        order = {}
         for idx, cube_info in enumerate(cube):
-            normal = normals[idx]
-            inner = v_camera.inner(Vector.fromList(normal))
-            if inner > 0:
-                order['front'][idx] = normal
-            else:
-                order['back'][idx] = normal
+            normal = Vector.fromList(cube_info['normal'])
+            angle = v_camera.angle(normal)
+            order[idx] = angle
 
-        glBegin(GL_TRIANGLES)
-        for pos in ['back', 'front']:
-            idxs = order[pos]
-            for idx in idxs:
-                surface = cube[idx]
-                normal = idxs[idx]
-                if mat is '':
-                    color = [0.0, 0.0, 0.0]
-                    for idx, point in enumerate(surface):
-                        if sum(point) >= 2.0 * length:
-                            color[idx - 1] = 1.0
-                    glColor4f(color[0], color[1], color[2], 0.5)
-                glNormal3f(normal[0], normal[1], normal[2])
-                for point in surface:
-                    glVertex3f(point[0], point[1], point[2])
-        glEnd()
+        sorted_order = sorted(order.items(), key = lambda kv: kv[1], reverse = True)
+
+        for order in sorted_order:
+            surface = cube[order[0]]
+            normal = surface['normal']
+            color = surface['color']
+
+            glBegin(GL_QUADS)
+
+            if mat is '':
+                glColor4f(color[0], color[1], color[2], 0.5)
+            glNormal3f(normal[0], normal[1], normal[2])
+
+            for point in surface['points']:
+                glVertex3f(point[0], point[1], point[2])
+
+            glEnd()
 
     def reshape(self, w, h):
         glViewport(0, 0, w, h)
