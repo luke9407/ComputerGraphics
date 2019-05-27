@@ -42,6 +42,17 @@ class Shading:
         self.cross_section_splines = []
         self.cross_point_splines = []
 
+        self.stl = open('my.stl', 'w')
+        self.write_stl('solid cup')
+
+    def write_stl(self, line, close=False):
+        if self.stl.closed:
+            return
+        self.stl.write(line)
+        self.stl.write('\n')
+        if close:
+            self.stl.close()
+
     def init(self):
         glClearColor(0.74902, 0.847059, 0.847059, 1.0)
 
@@ -129,52 +140,54 @@ class Shading:
             self.up[0], self.up[1], self.up[2]
         )
 
-        glPushMatrix()
-        glTranslatef(25.0, -4.0, 0.0)
-        self.draw_box(5.0, 'bronze')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(-25.0, -4.0, 0.0)
-        self.draw_box(5.0, 'chrome')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(25.0, -4.0, 25.0)
-        self.draw_box(5.0, 'copper')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(-25.0, -4.0, 25.0)
-        self.draw_box(5.0, 'gold')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(0.0, -4.0, 25.0)
-        self.draw_box(5.0, 'silver')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(-25.0, -4.0, -25.0)
-        self.draw_box(5.0, 'green_plastic')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(0.0, -4.0, -25.0)
-        self.draw_box(5.0, 'red_rubber')
-        glPopMatrix()
-
-        glPushMatrix()
-        glTranslatef(25.0, -4.0, -25.0)
-        self.draw_box(5.0, 'emerald')
-        glPopMatrix()
+        # glPushMatrix()
+        # glTranslatef(25.0, -4.0, 0.0)
+        # self.draw_box(5.0, 'bronze')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(-25.0, -4.0, 0.0)
+        # self.draw_box(5.0, 'chrome')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(25.0, -4.0, 25.0)
+        # self.draw_box(5.0, 'copper')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(-25.0, -4.0, 25.0)
+        # self.draw_box(5.0, 'gold')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(0.0, -4.0, 25.0)
+        # self.draw_box(5.0, 'silver')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(-25.0, -4.0, -25.0)
+        # self.draw_box(5.0, 'green_plastic')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(0.0, -4.0, -25.0)
+        # self.draw_box(5.0, 'red_rubber')
+        # glPopMatrix()
+        #
+        # glPushMatrix()
+        # glTranslatef(25.0, -4.0, -25.0)
+        # self.draw_box(5.0, 'emerald')
+        # glPopMatrix()
 
         self.draw_cross_point()
 
-        glPushMatrix()
-        glTranslatef(0.0, -4.0, 0.0)
-        self.draw_box(15.0)
-        glPopMatrix()
+        # glPushMatrix()
+        # glTranslatef(0.0, -4.0, 0.0)
+        # self.draw_box(15.0)
+        # glPopMatrix()
+
+        self.write_stl('endsolid cup', True)
 
         glutSwapBuffers()
 
@@ -198,11 +211,28 @@ class Shading:
                 glVertex3f(s1[j + 1][0], s1[j + 1][1], s1[j + 1][2])
                 glVertex3f(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2])
 
+                self.write_stl('facet normal {0}'.format(' '.join(map(str, normal))))
+                self.write_stl('outer loop')
+                self.write_stl('vertex {0} {1} {2}'.format(s1[j][0], s1[j][1], s1[j][2]))
+                self.write_stl('vertex {0} {1} {2}'.format(s1[j + 1][0], s1[j + 1][1], s1[j + 1][2]))
+                self.write_stl('vertex {0} {1} {2}'.format(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2]))
+                self.write_stl('endloop')
+                self.write_stl('endfacet')
+
                 normal = v_camera.calculate_normal(s2[j + 1], s1[j], s2[j])
                 glNormal3f(normal[0], normal[1], normal[2])
                 glVertex3f(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2])
                 glVertex3f(s2[j][0], s2[j][1], s2[j][2])
                 glVertex3f(s1[j][0], s1[j][1], s1[j][2])
+
+                self.write_stl('facet normal {0}'.format(' '.join(map(str, normal))))
+                self.write_stl('outer loop')
+                self.write_stl('vertex {0} {1} {2}'.format(s2[j + 1][0], s2[j + 1][1], s2[j + 1][2]))
+                self.write_stl('vertex {0} {1} {2}'.format(s2[j][0], s2[j][1], s2[j][2]))
+                self.write_stl('vertex {0} {1} {2}'.format(s1[j][0], s1[j][1], s1[j][2]))
+                self.write_stl('endloop')
+                self.write_stl('endfacet')
+
                 glEnd()
 
     def draw_box(self, length, mat=''):
@@ -400,7 +430,7 @@ class Shading:
 def main():
     args = sys.argv
 
-    f = os.path.join(os.path.dirname(__file__), '../sample/my.txt')
+    f = os.path.join(os.path.dirname(__file__), '../sample/stl.txt')
     parser = Parser(f)
 
     glutInit(args)
